@@ -30,9 +30,8 @@ which can be found [on our website](http://influxdb.com/community/cla.html)
 
 Assuming you can already build the project, run these in the telegraf directory:
 
-1. `go get github.com/sparrc/gdm`
-1. `gdm restore`
-1. `GOOS=linux gdm save`
+1. `dep ensure -vendor-only`
+2. `dep ensure -add github.com/[dependency]/[new-package]`
 
 ## Input Plugins
 
@@ -79,7 +78,10 @@ func (s *Simple) Description() string {
 }
 
 func (s *Simple) SampleConfig() string {
-    return "ok = true # indicate if everything is fine"
+    return `
+  ## Indicate if everything is fine
+  ok = true
+`
 }
 
 func (s *Simple) Gather(acc telegraf.Accumulator) error {
@@ -96,6 +98,13 @@ func init() {
     inputs.Add("simple", func() telegraf.Input { return &Simple{} })
 }
 ```
+
+### Input Plugin Development
+
+* Run `make static` followed by `make plugin-[pluginName]` to spin up a docker dev environment
+using docker-compose.
+* ***[Optional]*** When developing a plugin, add a `dev` directory with a `docker-compose.yml` and `telegraf.conf`
+as well as any other supporting files, where sensible.
 
 ## Adding Typed Metrics
 
@@ -167,7 +176,7 @@ and `Stop()` methods.
 ### Service Plugin Guidelines
 
 * Same as the `Plugin` guidelines, except that they must conform to the
-`inputs.ServiceInput` interface.
+[`telegraf.ServiceInput`](https://godoc.org/github.com/influxdata/telegraf#ServiceInput) interface.
 
 ## Output Plugins
 
@@ -207,7 +216,9 @@ func (s *Simple) Description() string {
 }
 
 func (s *Simple) SampleConfig() string {
-    return "url = localhost"
+    return `
+  ok = true
+`
 }
 
 func (s *Simple) Connect() error {
